@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <h2>Propy e-sign demo</h2>
     <script type="text/javascript">
         var signatureRequestId = ""
 
@@ -71,12 +72,14 @@
                             if (eventData.event === 'signature_request_signed') {
                                 console.log("DOCUMENT WAS SIGNED")
                                 console.log(eventData.signature_id)
-                                $.get('http://propy-demo.herokuapp.com/getFinalDownload/' + signatureRequestId, null, function(res) {
-                                    console.log(res)
-                                    $('#DownloadBtn').show().click(function() {
-                                        window.location = res
+                                setTimeout(function() {
+                                    $.get('http://propy-demo.herokuapp.com/getFinalDownload/' + signatureRequestId, null, function(res) {
+                                        console.log(res)
+                                        $('#DownloadBtn').show().click(function() {
+                                            window.location = res
+                                        })
                                     })
-                                })
+                                }, 5000)
                             }
                         }
                     });
