@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <% include ../partials/header.ejs %>
+        <script type="text/javascript" src="https://s3.amazonaws.com/cdn.hellosign.com/public/js/hellosign-embedded.LATEST.min.js"></script>
+
+</head>
+
+<body>
+    <script type="text/javascript">
+        var signatureRequestId = ""
+
+        function login() {
+            // $.post("https://demo.propy.com/api/authenticate", {
+            //         username: $('#email').prop('value'),
+            //         password: $('#password').prop('value')
+            //     })
+            //     .done(function(data) {
+            //         if (data.id) {
+            //             $('#Sign').prop('disabled', false).show()
+            //             $('#showData').html(JSON.stringify(data, null, 2))
+            //         } else {
+            //             alert('user has no id')
+            //         }
+            //     })
+
+            authData = {
+                "id": 101,
+                "login": "test@mail.com",
+                "email": "test@mail.com",
+                "firstname": "John ",
+                "lastname": "Wong",
+                "params": {
+                    "ccvaliduntil": "12/24",
+                    "PAName": "John  Wong",
+                    "babank": "fewfwefwef",
+                    "dealOWC4o2fpf6durq4t": "0x8374e6e114ce13f5186dc4f139b864e2a9c56b5f0259865ef668bdc34216c707",
+                    "banum": "fwefwef",
+                    "ccnum": "1234567892696325",
+                    "dealOWCchv7qm0pmh9il": "0xc49a989bf031674195ef14599efe6d48e80023357cecc8467702f3f590a75e1e",
+                    "PAMaritalStatus": "married",
+                    "PAAddress": "9 South Dogwood Rd. , Huntington Park, CA 90255",
+                    "baname": "deewfew"
+                },
+                "password": null,
+                "address": "9 South Dogwood Rd. , Huntington Park, CA 90255",
+                "token": "s7f7urpuk4hlmjrhg8utc2hibj",
+                "fullname": "John  Wong"
+            }
+
+        }
+        showHelloSign = function() {
+            HelloSign.init("07082ea7036af829954c5d2ec103b45e");
+            $.post("http://propy-demo.herokuapp.com/getSignURL", {
+                    name: "John",
+                    time: "2pm"
+                })
+                .done(function(data) {
+                    console.log("Got URL: ")
+                        // data = JSON.parse(data)
+                    console.log(data)
+                    signatureRequestId = data.signatureRequestId
+                    HelloSign.open({
+                        skipDomainVerification: true,
+                        url: data.url,
+                        allowCancel: true,
+                        messageListener: function(eventData) {
+                            // alert("HelloSign event received");
+                            console.log('HSEvent:', eventData)
+                            if (eventData.event === 'signature_request_signed') {
+                                console.log("DOCUMENT WAS SIGNED")
+                                console.log(eventData.signature_id)
+                                $.get('http://propy-demo.herokuapp.com/getFinalDownload/' + signatureRequestId, null, function(res) {
+                                    console.log(res)
+                                    $('#DownloadBtn').show().click(function() {
+                                        window.location = res
+                                    })
+                                })
+                            }
+                        }
+                    });
+                });
+        }
+    </script>
+    <div class="container" style="margin:20px;">
+        <div class="row">
+            <div class="col-5 col-centered">
+                <label for="email">email</label>
+                <input id="email" type="text" value="test@mail.com" />
+
+                <label for="password">password</label>
+                <input id="password" type="text" value="123" />
+
+                <input id="Login" type="button" value="Authenticate" onclick="login();" />
+
+                <input id="Sign" type="button" value="Sign" onclick="showHelloSign();" />
+                <input id="DownloadBtn" type="button" value="Download" download>
+            </div>
+            <div id="showData"> </div>
+        </div>
+    </div>
+
+
+</body>
+<script type="text/javascript">
+    // $('#Sign').hide()
+    $('#DownloadBtn').hide()
+</script>
+
+
+</html>
